@@ -1,9 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe User, type: :model do
-  let(:user) {User.new(name: 'Tom', photo: 'https://unsplash.com/photos/F_-0BxGuVvo', bio: 'Teacher from Mexico.')}
+  let(:user) { User.new(name: 'Tom', photo: 'https://unsplash.com/photos/F_-0BxGuVvo', bio: 'Teacher from Mexico.') }
 
-  before{user.save}
+  before { user.save }
 
   it 'If user is created' do
     expect(user).to be_valid
@@ -24,16 +24,12 @@ RSpec.describe User, type: :model do
     expect(user).to be_valid
   end
 
-
   it 'To dispaly recent post not more than 3' do
-
     10.times do
       Post.create(author: user, title: 'Hello', text: 'This is my first post')
     end
 
-    recentPost = user.recent_posts
-    expect(recentPost.length).to eq(3)
+    recent_post = user.recent_posts
+    expect(recent_post.length).to eq(3)
   end
-
-
 end
