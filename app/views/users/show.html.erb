@@ -1,17 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Posts</title>
-  </head>
-  <body>
-    <h1>Render all users</h1>
-     <ul>
-      <li>User 1</li>
-      <li>User 2</li>
-      <li>User 3</li>
-    </ul>
-  </body>
-</html>
+<div id="user_container">
+  <%= render partial: "users/user_info", locals: { user: @user } %>
+</div>
+
+<div id="user_bio">
+  <h3>Bio</h3>
+  <p><%= @user.bio %></p>
+</div>
+
+<div id="post_container">
+  <% @user.recent_posts.each_with_index do |post, i| %>
+    <li>
+      <%= link_to "/users/#{@user.id}/posts/#{post.id}", id: "post" do %>
+        <%= render partial: "posts/post_info", locals: { post: post } %>
+      <% end %>
+    </li>
+  <% end %>
+</div>
+
+<button>
+
+<%= link_to "See all posts", "/users/#{@user.id}/posts?page=1" %>
+</button>
