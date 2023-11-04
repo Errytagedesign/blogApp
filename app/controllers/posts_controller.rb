@@ -9,7 +9,7 @@ class PostsController < ApplicationController
     @posts = @posts.paginate(page: params[:page], per_page: 2)
   end
 
-  # an action to render specific post using the post id
+  # an action to render specific post using the post
   def show
     @post = Post.find(params[:id])
   end
