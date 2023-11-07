@@ -6,7 +6,7 @@ class PostsController < ApplicationController
     # Get the post associated with the above user, where the authorId matches the user id above
     @posts = Post.where(author_id: params[:user_id]).order(id: :asc)
     # paginate post by showing two at a go
-    @posts = @posts.paginate(page: params[:page], per_page: 2)
+    @posts = @posts.paginate(page: params[:page], per_page: 5)
   end
 
   # an action to render specific post using the post id
