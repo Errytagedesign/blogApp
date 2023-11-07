@@ -69,3 +69,5 @@ group :test do
   gem 'selenium-webdriver'
   gem 'database_cleaner'
 end
+
+gem 'bullet', group: :development
