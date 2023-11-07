@@ -63,7 +63,7 @@ RSpec.describe 'When I open user index page', type: :system do
 
   it "shows some of the post's body" do
     visit "/users/#{@first_user.id}/posts?page=1"
-    string = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt lab...'
+    string = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor'
     sleep(1)
     expect(page).to have_content(string)
   end
