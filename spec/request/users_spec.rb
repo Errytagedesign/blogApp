@@ -1,52 +1,66 @@
+# Include RSpec configuration for Rails
 require 'rails_helper'
 
+# Describe the test for the "Users" controller
 RSpec.describe 'Users', type: :request do
-  let(:user) { User.create(name: 'Lilly', photo: 'https://unsplash.com/photos/F_-0BxGuVvo', bio: 'Teacher from Poland.') }
-  describe 'GET /' do
-    it 'renders the root page' do
-      get '/'
-      expect(response).to have_http_status(200)
+  # Context for the "GET /index" test
+  context 'GET /index' do
+    before :each do
+      # Perform an HTTP GET request to retrieve the list of users
+      User.create(name: 'Tom')
+      get users_path
     end
-  end
 
-  describe 'GET /users' do
-    it 'renders the users index page' do
-      get '/users'
-      expect(response).to have_http_status(200)
+    # Check that the response is successful
+    it 'returns a successful response' do
+      expect(response).to be_successful
     end
-  end
 
-  describe 'GET /users' do
-    it 'renders the user index page with correct template' do
-      get '/users'
+    # Check that the HTTP status is 200
+    it 'returns an HTTP status of 200' do
+      expect(response.status).to eq(200)
+    end
+
+    # Check that the correct view is rendered
+    it 'renders the correct view file' do
       expect(response).to render_template(:index)
     end
-  end
-  describe 'GET /users' do
-    it 'renders the user index page with correct placeholder text' do
-      get '/users'
-      expect(response.body).to include('User 1')
+
+    # Check for the presence of an HTML tag in the response body
+    it 'renders the correct placeholder' do
+      expect(response.body).to include('<h2>Tom</h2>')
     end
   end
 
-  describe 'GET /users/:id' do
-    it 'renders the user show page' do
-      get "/users/:#{user.id}"
-      expect(response).to have_http_status(200)
+  # Context for the "GET /show" test
+  context 'GET /show' do
+    let(:valid_attributes) { { 'name' => 'Tom' } }
+    let(:user) { User.create! valid_attributes }
+    before :each do
+      # Perform an HTTP GET request to display a specific user
+      get user_url(user)
     end
-  end
 
-  describe 'GET /users/:id' do
-    it 'renders the user show page with correct template' do
-      get "/users/#{user.id}"
+    # Check that the response is successful
+    it 'returns a successful response' do
+      expect(response).to be_successful
+    end
+
+    # Check that the HTTP status is 200
+    it 'returns an HTTP status of 200' do
+      expect(response.status).to eq(200)
+    end
+
+    # Check that the correct view is rendered
+    it 'renders the correct view file' do
       expect(response).to render_template(:show)
     end
-  end
 
-  describe 'GET /users/:id' do
-    it 'renders the user show page with correct placeholder text' do
-      get "/users/#{user.id}"
-      expect(response.body).to include('<h1>Render all users</h1>')
+    # Check for the presence of an HTML tag in the response body
+    it 'renders the correct placeholder' do
+      expect(response.body).to include('<h2>Tom</h2>')
+      expect(response.body).to include('<p>Number of posts: 0</p>')
+      expect(response.body).to include('<h3>Bio</h3>')
     end
   end
 end
