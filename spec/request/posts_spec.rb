@@ -1,65 +1,44 @@
-# Include RSpec configuration for Rails
 require 'rails_helper'
 
-# Describe the test for the "Posts" controller
 RSpec.describe 'Posts', type: :request do
-  # Context for the "GET /index" test
-  context 'GET /index' do
-    before :each do
-      # Perform an HTTP GET request to retrieve the list of posts for a user
-      get '/users/:user_id/posts'
+  let(:user) { User.create(name: 'Tom', photo: 'https://unsplash.com/photos/F_-0BxGuVvo', posts_counter: 0) }
+  let(:valid_attributes) do
+    { author: user, text: 'xxxxxxxxxxx', title: 'meeting', comments_counter: 0, likes_counter: 0 }
+  end
+
+  describe 'GET /index' do
+    before { get user_posts_path(user) }
+
+    it 'returns the correct response status' do
+      expect(response).to have_http_status(200)
     end
 
-    # Check that the response is successful
-    it 'returns a successful response' do
-      expect(response).to be_successful
+    it 'response body includes correct placeholder text' do
+      expect(response.body).to include('Tom')
     end
 
-    # Check that the HTTP status is 200
-    it 'returns an HTTP status of 200' do
-      expect(response.status).to eq(200)
-    end
-
-    # Check that the correct view is rendered
-    it 'renders the correct view file' do
+    it 'renders the correct template' do
       expect(response).to render_template(:index)
-    end
-
-    # Check for the presence of an HTML tag in the response body
-    it 'renders the correct placeholder' do
-      expect(response.body).to include('<h1>Render list of post by a given user</h1>')
     end
   end
 
-  # Context for the "GET /show" test
-  context 'GET /show' do
-    let(:user) { User.create(name: 'Tom') }
-    let(:valid_attributes) { { 'author' => user, 'title' => 'Title' } }
-    let(:post) { Post.create! valid_attributes }
-
-    before :each do
-      # Perform an HTTP GET request to display a specific post for a user
-      get "/users/:user_id/posts/#{post.id}"
+  describe 'GET /show' do
+    it 'returns the correct response status' do
+      post = Post.create!(valid_attributes)
+      get user_post_path(user, post)
+      expect(response).to have_http_status(200)
     end
 
-    # Check that the response is successful
-    it 'returns a successful response' do
-      expect(response).to be_successful
-    end
-
-    # Check that the HTTP status is 200
-    it 'returns an HTTP status of 200' do
-      expect(response.status).to eq(200)
-    end
-
-    # Check that the correct view is rendered
-    it 'renders the correct view file' do
+    it 'renders the correct template' do
+      post = Post.create!(valid_attributes)
+      get user_post_path(user, post)
       expect(response).to render_template(:show)
     end
 
-    # Check for the presence of an HTML tag in the response body
-    it 'renders the correct placeholder' do
-      expect(response.body).to include('<h1>Render list of post by a given user</h1>')
+    it 'response body includes correct placeholder text' do
+      post = Post.create!(valid_attributes)
+      get user_post_path(user, post)
+      expect(response.body).to include('Tom')
     end
   end
 end

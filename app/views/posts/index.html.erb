@@ -1,31 +1,16 @@
-<div id="user_container">
-   <%= render partial: "users/user_info", locals: { user: @user } %>
-</div>
-
-<% flash.each do |name, msg| -%>
-  <%= content_tag :div, msg, class: name %>
-<% end -%>
-
-<button>
-
-<%= link_to 'New Post', new_user_post_path %>
-</button>
-
-<ul id="post_container">
-  <% @posts.each_with_index do |post, i| %>
-    <li>
-      <%= link_to "/users/#{@user.id}/posts/#{post.id}", id: "post" do %>
-        <%= render partial: "posts/post_info", locals: { post: post } %>
-      <% end %>
-      <ul id="comment_container">
-        <% post.recent_comments.each do |comment| %>
-          <li id="comment">
-            <p><%= comment.user.name %>: <%= comment.text %></p>
-          </li>
-        <% end %>
-      </ul>
-    </li>
+<%= link_to "create new post", new_user_post_path, class:"all-post-btn"  %>
+<%= render 'users/user_info', user: @user %>
+<% @posts.each do |post| %>
+  <%= render 'post_info', user: @user, post: post%>
+  <% if post.comments.any? %>
+  <ul class= "comment-div">
+  <% post.recent_comments.each do |comment| %>
+    <li><%= comment.user.name %>: <%= comment.text %></li>
   <% end %>
-</ul>
-
-<%= will_paginate %>
+  </ul>
+  <% else %>
+  <% end %>
+  <% end %>
+  <div class="pagination">
+  <%= link_to "Pagination", user_posts_path(@user), class:"all-post-btn"  %>
+  </div>

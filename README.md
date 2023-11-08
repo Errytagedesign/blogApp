@@ -95,6 +95,12 @@ rails server
 - Twitter: [@twitterhandle](https://twitter.com/errytage)
 - LinkedIn: [LinkedIn](https://www.linkedin.com/in/errytagedesigns/)
 
+#### 👤 Joyce Cruz
+
+- GitHub: [@githubhandle](https://github.com/balatstar)
+- Twitter: [@twitterhandle](https://twitter.com/balatstar)
+- LinkedIn: [LinkedIn](https://www.linkedin.com/in/joyce-ann-cruz-668a41a7/)
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- FUTURE FEATURES -->

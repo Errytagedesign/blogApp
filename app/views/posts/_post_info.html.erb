@@ -1,5 +1,8 @@
-<h3><%= post.title %></h3>
-<p><%= post.text %></p>
-<p class="counter">
-  Comments: <%= post.comments_counter.to_i %>, Likes: <%= post.likes_counter.to_i %>
-</p>
+<div class="user-post-div">
+<p class="post-title"><%= link_to post.title, user_post_path(user, post) %></p>
+<p class="post-text"><%= truncate(post.text)%></p>
+<div class="comments-likes">
+<p class="post-text"> Comments:<%= post.comments_counter%>,</p>
+<p class="post-text"> Likes:<%= post.likes_counter%></p>
+</div>
+</div>

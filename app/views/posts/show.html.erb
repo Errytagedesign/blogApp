@@ -1,23 +1,33 @@
-<div id="post" >
-  <h3><%= @post.title %> by <%= @post.author.name %></h3>
-  <p class="counter">
-    Comments: <%= @post.comments_counter.to_i %>, Likes: <%= @post.likes_counter.to_i %>
-  </p>
-  <p><%= @post.text %></p>
+<div class="post-all">
+<div class="post-show">
+<p class="span"><%= @post.title %> by <%= @post.author.name %></p>
+<div class="comments-likes">
+<p class="post-text"> Comments:<%= @post.comments_counter%>,</p>
+<p class="post-text"> Likes:<%= @post.likes_counter%></p>
 </div>
-
-<% flash.each do |name, msg| -%>
-  <%= content_tag :div, msg, class: name %>
-<% end -%>
-
-<ul id="comment_container">
+</div>
+<p><%= @post.text %></p>
+<% if user_already_liked?(@post) %>
+<%= button_to "Dislike", user_post_likes_path(current_user, @post), method: :delete, class:"all-post-btn" %>
+<% else %>
+<%= button_to "Like", user_post_likes_path(current_user, @post), method: :post, class:"all-post-btn"  %>
+<% end %>
+</div>
+<% if @post.comments.any? %>
+  <ul class= "comment-div">
   <% @post.comments.each do |comment| %>
-    <li id="comment">
-      <p><%= comment.user.name %>: <%= comment.text %></p>
-    </li>
+    <li><%= comment.user.name %>: <%= comment.text %></li>
   <% end %>
-</ul>
-
-<% flash.each do |name, msg| -%>
-  <%= content_tag :div, msg, class: name %>
-<% end -%>
+  </ul>
+  <% else %>
+  <% end %>
+  <h2>Add a comment</h2>
+  <%= form_with model:[current_user, @post, Comment.new] do |form| %>
+    <div>
+    <%= form.label :text %>
+    <%= form.text_field :text%>
+    </div>
+    <div>
+    <%= form.submit%>
+    </div>
+<% end %>
