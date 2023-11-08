@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
-  # Create currentUser method to provide a dummy response with the first user from the database
+  helper_method :current_user
   def current_user
-    @first_user = User.first
+    User.first
   end
 end

@@ -1,23 +1,11 @@
-<div id="user_container">
-  <%= render partial: "users/user_info", locals: { user: @user } %>
+<%= render 'user_info', user: @user %>
+<div class="user-details">
+<div class="user-bio-div">
+  <p class="bio-tag">Bio</p>
+  <p class="bio"><%= @user.bio %></p>
 </div>
-
-<div id="user_bio">
-  <h3>Bio</h3>
-  <p><%= @user.bio %></p>
+<% @user.recent_post.each do |post| %>
+    <%= render 'posts/post_info', user: @user, post: post %>
+<% end %>
+<%= link_to "See all post", user_posts_path(@user), class:"all-post-btn"  %>
 </div>
-
-<div id="post_container">
-  <% @user.recent_posts.each_with_index do |post, i| %>
-    <li>
-      <%= link_to "/users/#{@user.id}/posts/#{post.id}", id: "post" do %>
-        <%= render partial: "posts/post_info", locals: { post: post } %>
-      <% end %>
-    </li>
-  <% end %>
-</div>
-
-<button>
-
-<%= link_to "See all posts", "/users/#{@user.id}/posts?page=1" %>
-</button>

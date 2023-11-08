@@ -11,7 +11,7 @@ RSpec.describe Comment, type: :model do
     before { comment.save }
 
     it 'increments the comment_counter of the associated user' do
-      expect { comment.send(:update_comments_counter) }.to change { post.reload.comments_counter }.by(1)
+      expect { comment.send(:update_comment_counter) }.to change { post.reload.comments_counter }.by(1)
     end
   end
 end

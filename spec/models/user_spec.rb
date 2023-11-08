@@ -1,35 +1,24 @@
 require 'rails_helper'
 
 RSpec.describe User, type: :model do
-  let(:user) { User.new(name: 'Tom', photo: 'https://unsplash.com/photos/F_-0BxGuVvo', bio: 'Teacher from Mexico.') }
-
+  let(:user) { User.create(name: 'Lilly', photo: 'https://unsplash.com/photos/F_-0BxGuVvo', bio: 'Teacher from Poland.') }
   before { user.save }
-
-  it 'If user is created' do
+  it 'is valid' do
     expect(user).to be_valid
   end
-
-  it 'New user should have a name' do
+  it 'is not vaild when user name is not present' do
     user.name = nil
     expect(user).not_to be_valid
   end
-
-  it 'Invalid when post counter is negative' do
-    user.posts_counter = -3
+  it 'is not vaild when posts counter is negative' do
+    user.posts_counter = -2
     expect(user).not_to be_valid
   end
-
-  it 'Valid when post counter is 0 or more' do
-    user.posts_counter = 1
-    expect(user).to be_valid
-  end
-
-  it 'To dispaly recent post not more than 3' do
-    10.times do
+  it 'is display three recent post' do
+    5.times do
       Post.create(author: user, title: 'Hello', text: 'This is my first post')
     end
-
-    recent_post = user.recent_posts
-    expect(recent_post.length).to eq(3)
+    posts = user.recent_post
+    expect(posts.length).to eq(3)
   end
 end

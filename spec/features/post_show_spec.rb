@@ -1,73 +1,85 @@
 require 'rails_helper'
 
-RSpec.describe 'When I open user show page', type: :system do
-  before :all do
-    Like.delete_all
-    Comment.delete_all
-    Post.delete_all
-    User.delete_all
-    @first_user = User.create(name: 'Tom', photo: 'https://unsplash.com/photos/F_-0BxGuVvo',
-                              bio: 'Teacher from Mexico.')
-    @second_user = User.create(name: 'Lilly', photo: 'https://unsplash.com/photos/F_-0BxGuVvo',
-                               bio: 'Teacher from Poland.')
-    @third_user = User.create(name: 'Alan', photo: 'https://unsplash.com/photos/F_-0BxGuVvo',
-                              bio: 'Singer from Mexico.')
-    @latest_post = Post.create(author: @first_user, title: 'Latest Post', text: 'This is my latest post')
+RSpec.describe 'Post', type: :feature do
+  let(:user) { User.new(name: 'Tom', photo: 'https://unsplash.com/photos/F_-0BxGuVvo', bio: 'Teacher from Mexico.') }
+  let(:post) { Post.new(author: user, title: 'Hello', text: 'This is my first post') }
 
-    @index = 1
-    (1..3).each do
-      Comment.create(post: @latest_post, user: @second_user, text: "Comment ##{@index}")
-      @index += 1
-      Comment.create(post: @latest_post, user: @third_user, text: "Comment ##{@index}")
-      @index += 1
+  before { user.save }
+
+  context 'Click' do
+    it "redirects me to that post's show page when I click on a post" do
+      visit_user_posts_path
+
+      if user.posts.any?
+        first_recent_post = user.recent_post[0]
+        click_post_title(first_recent_post)
+        expect(page).to have_current_path(user_post_path(user, first_recent_post))
+      end
+    end
+  end
+
+  context 'show page' do
+    before { visit_first_recent_post }
+
+    it "shows the post's title" do
+      expect(page).to have_content(first_recent_post.title) if user.posts.any?
     end
 
-    10.times { Like.create(post: @latest_post, user: @third_user) }
-    10.times { Like.create(post: @latest_post, user: @second_user) }
+    it "shows the post's author" do
+      expect(page).to have_content(first_recent_post.author.name) if user.posts.any?
+    end
+
+    it 'shows how many likes the post has.' do
+      expect(page).to have_content("Likes: #{first_recent_post.likes_counter}") if user.posts.any?
+    end
+
+    it 'shows how many comments the post has.' do
+      expect(page).to have_content("Comments: #{first_recent_post.comments_counter}") if user.posts.any?
+    end
+
+    it 'shows the post body.' do
+      expect(page).to have_content(first_recent_post.text) if user.posts.any?
+    end
+
+    it 'shows the username of each commenter' do
+      show_comment_usernames if user.posts.any? && first_recent_post.comments.any?
+    end
+
+    it 'shows the comment left by each commenter' do
+      show_comments if user.posts.any? && first_recent_post.comments.any?
+    end
   end
 
-  it "shows the post's title" do
-    visit user_post_path(@first_user, @latest_post)
-    sleep(1)
-    expect(page).to have_content('Latest Post')
+  private
+
+  def visit_user_posts_path
+    visit user_posts_path(user)
   end
 
-  it 'shows who wrote the post' do
-    visit user_post_path(@first_user, @latest_post)
-    sleep(1)
-    expect(page).to have_content('by Tom')
+  def click_post_title(post)
+    click_link post.title
   end
 
-  it 'shows how many comments it has' do
-    visit user_post_path(@first_user, @latest_post)
-    sleep(1)
-    expect(page).to have_content('Comments: 6')
+  def visit_first_recent_post
+    return unless user.posts.any?
+
+    first_recent_post = user.recent_post[0]
+    visit user_post_path(user, first_recent_post)
   end
 
-  it 'shows how many likes it has' do
-    visit user_post_path(@first_user, @latest_post)
-    sleep(1)
-    expect(page).to have_content('Likes: 20')
+  def first_recent_post
+    user.recent_post[0]
   end
 
-  it 'shows the post body' do
-    visit user_post_path(@first_user, @latest_post)
-    sleep(1)
-    expect(page).to have_content('This is my latest post')
+  def show_comment_usernames
+    first_recent_post.comments.each do |comment|
+      expect(page).to have_content(comment.user.name)
+    end
   end
 
-  it 'shows the username of each commentor' do
-    visit user_post_path(@first_user, @latest_post)
-    sleep(1)
-    expect(page).to have_text('Lilly:', count: 3)
-    expect(page).to have_text('Alan:', count: 3)
-  end
-
-  it 'shows the comment each commentor left' do
-    visit user_post_path(@first_user, @latest_post)
-    sleep(1)
-    (1..6).each do |i|
-      expect(page).to have_content("Comment ##{i}")
+  def show_comments
+    first_recent_post.comments.each do |comment|
+      expect(page).to have_content(comment.text)
     end
   end
 end

@@ -1,10 +1,9 @@
 class UsersController < ApplicationController
+  layout 'application'
   def index
-    # render user based on id in ascending order
-    @users = User.order(id: :asc)
+    @users = User.all
   end
 
-  # render specific user based on id
   def show
     @user = User.find(params[:id])
   end

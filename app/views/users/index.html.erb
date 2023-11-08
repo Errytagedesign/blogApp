@@ -1,9 +1,3 @@
-<ul id="users_container">
-  <% @users.each do |user| %>
-    <li>
-      <%= link_to user_url(user), class: "user", id: user.name do %>
-        <%= render partial: "users/user_info", locals: { user: user } %>
-      <% end %>
-    </li>
-  <% end %>
-</ul>
+<% @users.each do |user| %>
+   <%= render 'user_info', user: user %>
+<% end %>

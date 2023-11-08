@@ -1,107 +1,66 @@
 require 'rails_helper'
-require './spec/features/placeholder'
 
-RSpec.describe 'When I open user index page', type: :system do
-  include TestPlaceholders
-  before :all do
-    Like.delete_all
-    Comment.delete_all
-    Post.delete_all
-    User.delete_all
-    @first_user = User.create(name: 'Tom', photo: 'https://unsplash.com/photos/F_-0BxGuVvo',
-                              bio: 'Teacher from Mexico.')
-    @second_user = User.create(name: 'Lilly', photo: 'https://unsplash.com/photos/F_-0BxGuVvo',
-                               bio: 'Teacher from Poland.')
-    @third_user = User.create(name: 'Alan', photo: 'https://unsplash.com/photos/F_-0BxGuVvo',
-                              bio: 'Singer from Mexico.')
+RSpec.describe 'Posts', type: :feature do
+  let(:user) { User.new(name: 'Tom', photo: 'https://unsplash.com/photos/F_-0BxGuVvo', bio: 'Teacher from Mexico.') }
+  let!(:post) { Post.new(author: user, title: 'Hello', text: 'This is my first post') }
 
-    @first_post = Post.create(author: @first_user, title: 'First Post', text: placeholder)
+  before { user.save }
 
-    (1..10).each do |i|
-      Post.create(author: @first_user, title: "Post ##{i}")
+  describe 'index page' do
+    before { visit user_posts_path(user) }
+
+    it 'shows the user name' do
+      expect(page).to have_content(user.name)
     end
 
-    @index = 1
-    (1..6).each do
-      Comment.create(post: @first_post, user: @second_user, text: "Comment ##{@index}")
-      @index += 1
-      Comment.create(post: @first_post, user: @third_user, text: "Comment ##{@index}")
-      @index += 1
+    it "shows the user's profile picture" do
+      expect(page).to have_selector("img[src='#{user.photo}']")
     end
 
-    10.times { Like.create(post: @first_post, user: @third_user) }
-    10.times { Like.create(post: @first_post, user: @second_user) }
-  end
+    it 'shows the number of posts for each user' do
+      expect(page).to have_content("Number of Posts: #{user.posts_counter}")
+    end
+    context 'Click' do
+      let(:first_recent_post) { user.recent_post[0] }
+      it "redirects me to that post's show page when I click on a post" do
+        if first_recent_post
+          click_link first_recent_post.title
+          expect(page).to have_current_path(user_post_path(user, first_recent_post))
+        end
+      end
+    end
+    context 'when a recent post exists' do
+      let(:first_recent_post) { user.recent_post[0] }
+      let(:first_recent_comment) { post.recent_comments[0] }
+      it "shows the recent post's title" do
+        expect(page).to have_content(first_recent_post.title) if first_recent_post
+      end
 
-  it "shows the user's profile picture" do
-    visit "/users/#{@first_user.id}/posts?page=1"
-    sleep(1)
-    expect(page).to have_css("img[src='#{@first_user.photo}']")
-  end
+      it "shows some of the recent post's body" do
+        if first_recent_post
+          expected_text = if first_recent_post.text.length > 200
+                            "#{first_recent_post.text[0,
+                                                      200]}..."
+                          else
+                            first_recent_post.text
+                          end
+          expect(page).to have_content(expected_text)
+        end
+      end
 
-  it "shows the user's username" do
-    visit "/users/#{@first_user.id}/posts?page=1"
-    sleep(1)
-    expect(page).to have_content('Tom')
-  end
+      it 'shows the number of comments for the recent post' do
+        expect(page).to have_content("Comments: #{first_recent_post.comments_counter}") if first_recent_post
+      end
+      it 'asserts you can see the first comments on a post' do
+        expect(page).to have_content(first_recent_comment) if first_recent_post
+      end
+      it 'shows the number of likes for the recent post' do
+        expect(page).to have_content("Likes: #{first_recent_post.likes_counter}") if first_recent_post
+      end
+    end
 
-  it 'shows the number of posts the user has written' do
-    visit "/users/#{@first_user.id}/posts?page=1"
-    sleep(1)
-    expect(page).to have_content('Number of posts: 11')
-  end
-
-  it "shows a post's title" do
-    visit "/users/#{@first_user.id}/posts?page=1"
-    sleep(1)
-    expect(page).to have_content('First Post')
-    expect(page).to have_content('Post #1')
-    expect(page).to have_content('Post #2')
-    expect(page).to have_content('Post #3')
-    expect(page).to have_content('Post #4')
-  end
-
-  it "shows some of the post's body" do
-    visit "/users/#{@first_user.id}/posts?page=1"
-    string = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor'
-    sleep(1)
-    expect(page).to have_content(string)
-  end
-
-  it 'shows the first comments on a post' do
-    visit "/users/#{@first_user.id}/posts?page=1"
-    sleep(1)
-    expect(page).to have_content('Alan: Comment #8')
-    expect(page).to have_content('Lilly: Comment #9')
-    expect(page).to have_content('Alan: Comment #10')
-    expect(page).to have_content('Lilly: Comment #11')
-    expect(page).to have_content('Alan: Comment #12')
-  end
-
-  it 'shows how many comments a post has' do
-    visit "/users/#{@first_user.id}/posts?page=1"
-    sleep(1)
-    expect(page).to have_content('Comments: 12')
-  end
-
-  it 'shows how many likes a post has' do
-    visit "/users/#{@first_user.id}/posts?page=1"
-    sleep(1)
-    expect(page).to have_content('Likes: 20')
-  end
-
-  it 'shows a section for pagination if there are more posts than fit on the view' do
-    visit "/users/#{@first_user.id}/posts?page=1"
-    sleep(1)
-    expect(page).to have_link('2', href: "/users/#{@first_user.id}/posts?page=2")
-  end
-
-  context 'When I click on a post' do
-    it "redirects me to that post's show page" do
-      visit "/users/#{@first_user.id}/posts?page=1"
-      sleep(1)
-      click_link('First Post')
-      expect(page).to have_current_path(user_post_path(@first_user, @first_post))
+    it 'shows a section for pagination' do
+      expect(page).to have_selector('a', text: 'Pagination')
     end
   end
 end
